@@ -1,0 +1,115 @@
+<!-- Copyright (c) 2020 Cisco and/or its affiliates.
+This software is licensed to you under the terms of the Cisco Sample
+Code License, Version 1.1 (the "License"). You may obtain a copy of the
+License at
+           https://developer.cisco.com/docs/licenses
+All use of the material herein must be in accordance with the terms of
+the License. All rights not expressly granted by the License are
+reserved. Unless required by applicable law or agreed to separately in
+writing, software distributed under the License is distributed on an "AS
+IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+or implied. -->
+
+    {% extends "masterPage.html" %}
+
+    {% block content %}
+    <div class="row">
+            <!-- Left Rail -->
+            <div class="col-xl-3 col-md-3">
+            </div>
+    
+            <!-- Middle Rail -->
+            <div class="col-xl-6 col-md-6">
+                <div class="section" >
+                    <div class="panel panel--loose panel--raised base-margin-bottom">
+                        <form action="/" method="POST" name="envVars" enctype="multipart/form-data"> 
+                            <div class="section"> 
+                                
+                                <!-- Customer Logo -->
+                                <div class="flex flex-center half-margin-bottom">
+                                    <img id="customer-logo" src="{{ url_for('static', filename='images/logo_long_green.png')}}">
+                                </div>
+
+                                <p>Choose a context for the migration:</p>
+                                <div class="context half-margin-bottom">
+                                <!--dropdown_content = json string that includes all organization and networks of a user-->
+                                    <!--Orga fields-->
+                                    <div class="form-group base-margin-bottom">
+                                        <div class="form-group__text select">
+                                            <select name="organizations_select" id='organizations_select' required>
+                                                <option disabled selected hidden value="0">Please choose...</option>
+                                                {% for orga in dropdown_content %}<option value="{{orga.id}}" {% if selected_elements.organization == orga.id %} selected {% endif %}>{{orga.name}} (ID:{{orga.id}})</option>{% endfor %}
+                                            </select>
+                                            <label for="organizations_select">Organization*</label>
+                                        </div>
+                                    </div>
+
+                                    <!--Network fields-->
+                                {% for orga in dropdown_content %}
+                                    <div id="{{orga.id}}" class="network-select" {% if selected_elements.organization != orga.id %} hidden {% endif %}>
+                                        <div class="form-group base-margin-bottom">
+                                            <div class="form-group__text select">
+                                                <select name="network" class='networks'>
+                                                    <option disabled selected hidden value="0">Please choose...</option>
+                                                    {% for network in orga['networks'] %}
+                                                        <option value="{{network['id']}}" {% if selected_elements.network_id == network['id'] %} selected {% endif %}>{{network['name']}} (ID:{{network['id']}})</option>                                                      
+                                                    {% endfor %}
+                                                </select>
+                                                <label for="network">Network*</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!--Upload-->
+                                <div class="upload-area">
+                                    <p>Policy Groups and Objects File:*</p>
+                                    <input type="file" name="policy_objects" accept=".csv" required>
+                                    <a href="/downloadTemplate?file=object-import.csv"> Download Policy Elements Template </a>
+                                </div>
+
+                                <div class="upload-area">
+                                    <p>Firewall Rules Type and File:*</p>
+                                    
+                                    <div class="half-margin-bottom">
+                                        <div class="form-group form-group--inline">
+                                            <label class="radio">
+                                                <input name="type" id="l3" value="l3" type="radio" checked name="radio-inline">
+                                                <span class="radio__input"></span>
+                                                <span class="radio__label">Layer 3</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-group form-group--inline">
+                                            <label class="radio">
+                                                <input name="type" id="s2s" value="s2s" type="radio" name="radio-inline">
+                                                <span class="radio__input"></span>
+                                                <span class="radio__label">Site-to-Site VPN</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" name="firewall_rules" accept=".csv" required>
+                                    <a href="/downloadTemplate?file=fw-rules.csv"> Download Firewall Rules Template</a>
+                                </div>
+                                 
+                            <!-- Button area-->
+                            <input id="submit_button" onclick="submitMigrationForm(event)" onload="showOriginalText('Start Migration')" class="btn btn-primary" type="submit" value="Start Migration">
+                            <span class="required-label pull-right">* required fields</span>
+
+                            </div> 
+
+                        </form>
+                        
+                        <!--Alert for error message-->
+                        {% include "failure_alert.html" %}
+    
+                    </div>
+                </div>
+            </div>
+    
+        <!-- Right Rail -->
+        <div class="col-xl-3 col-md-3">
+        </div>
+    </div>
+    {%  endblock %}

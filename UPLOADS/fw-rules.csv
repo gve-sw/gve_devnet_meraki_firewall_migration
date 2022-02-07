@@ -1,0 +1,3 @@
+Rule Number,Policy,Comment,Protocol,Source CIDR,Source Port,Destination CIDR,Destination Port,Syslog Enabled
+,,,,,,,,
+END,END,END,END,END,END,END,END,END

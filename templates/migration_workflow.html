@@ -1,0 +1,117 @@
+<!-- Copyright (c) 2020 Cisco and/or its affiliates.
+This software is licensed to you under the terms of the Cisco Sample
+Code License, Version 1.1 (the "License"). You may obtain a copy of the
+License at
+           https://developer.cisco.com/docs/licenses
+All use of the material herein must be in accordance with the terms of
+the License. All rights not expressly granted by the License are
+reserved. Unless required by applicable law or agreed to separately in
+writing, software distributed under the License is distributed on an "AS
+IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+or implied. -->
+
+    {% extends "masterPage.html" %}
+
+    {% block content %}
+    <div class="row">
+            <!-- Left Rail -->
+            <div class="col-xl-3 col-md-3">
+            </div>
+    
+            <!-- Middle Rail -->
+            <div class="col-xl-6 col-md-6">
+                <div class="section" >
+                    <div class="panel panel--loose panel--raised base-margin-bottom">
+                        <form action="/login" method="POST" name="envVars"> 
+                                
+                                <div id="place_for_steps">
+                                    <div id="space-loader">
+                                        <div class="loading-dots" aria-label="Loading, please wait...">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                    </div> 
+                                </div>                                
+
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+    
+        <!-- Right Rail -->
+        <div class="col-xl-3 col-md-3">
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        //function to do ajax call to backend
+        function updateContent() {
+        
+            var xmlhttp = new XMLHttpRequest();
+        
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {   
+                if (xmlhttp.status == 200) {
+
+                    document.getElementById("place_for_steps").innerHTML = xmlhttp.response;
+                }
+                else if (xmlhttp.status == 400) {
+                    console.log('There was an error 400');
+                }
+                else {
+                    console.log('something else other than 200 was returned');
+                }
+                }
+            };
+        
+            xmlhttp.open("GET", "/steps", true);
+            xmlhttp.send();
+        }
+
+        //Add listener for page load to trigger pipeline
+        window.addEventListener("load", updateContent);
+        
+        //Observer to trigger next step of pipeline as soon as former step finished
+        // Select the node that will be observed for mutations
+        var targetNode = document.getElementById("place_for_steps");
+
+        // Options for the observer (which mutations to observe)
+        var config = {childList: true };
+
+        // Callback function to execute when mutations are observed
+        var callback = function(mutationsList) {
+            for(var mutation of mutationsList) {
+                if (mutation.type == 'childList') {
+
+                    var step8 = document.getElementById('step8');
+                    var error = document.getElementById('error').textContent;
+
+                    if (error == 'True'){
+                        //do nothing anymore since process finished
+                    }else if(step8 != null){
+                        //do nothing anymore since process finished
+                    }
+                    else{
+                        updateContent();
+                    }
+                    
+                }
+            }
+        };
+
+        // Create an observer instance linked to the callback function
+        var observer = new MutationObserver(callback);
+
+        // Start observing the target node for configured mutations
+        observer.observe(targetNode, config);
+
+        // Later, you can stop observing
+        //observer.disconnect();
+            
+    </script>
+
+    {%  endblock %}
+
